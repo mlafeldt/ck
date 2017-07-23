@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/mlafeldt/ck/convertkit"
 
@@ -16,15 +17,16 @@ func main() {
 		abort("%s", err)
 	}
 
-	lines := []string{"ID|Email"}
+	lines := []string{"ID|Signed up|Email"}
 	for _, s := range subscribers {
-		lines = append(lines, fmt.Sprintf("%d|%s",
+		lines = append(lines, fmt.Sprintf("%d|%s|%s",
 			s.ID,
-			s.Email,
+			s.CreatedAt.Format(time.RFC3339),
+			s.EmailAddress,
 		))
 	}
+
 	fmt.Println(columnize.SimpleFormat(lines))
-	fmt.Printf("%d subscribers\n", len(subscribers))
 }
 
 func abort(format string, a ...interface{}) {

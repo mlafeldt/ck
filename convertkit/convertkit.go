@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 )
 
 type Config struct {
@@ -55,8 +56,12 @@ func NewClient(c *Config) (*Client, error) {
 }
 
 type Subscriber struct {
-	ID    int    `json:"id"`
-	Email string `json:"email_address"`
+	ID           int               `json:"id"`
+	FirstName    string            `json:"first_name"`
+	EmailAddress string            `json:"email_address"`
+	State        string            `json:"state"`
+	CreatedAt    time.Time         `json:"created_at"`
+	Fields       map[string]string `json:"fields"`
 }
 
 type subscriberResponse struct {
