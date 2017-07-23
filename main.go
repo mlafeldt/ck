@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -11,7 +12,9 @@ import (
 )
 
 func main() {
-	client, _ := convertkit.NewClient(convertkit.DefaultConfig())
+	config := convertkit.DefaultConfig()
+	config.HTTPClient = &http.Client{Timeout: 10 * time.Second}
+	client, _ := convertkit.NewClient(config)
 	subscribers, err := client.Subscribers()
 	if err != nil {
 		abort("%s", err)
