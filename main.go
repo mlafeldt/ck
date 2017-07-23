@@ -52,7 +52,7 @@ func outputCSV(w io.Writer, subscribers []convertkit.Subscriber) error {
 }
 
 func outputTable(w io.Writer, subscribers []convertkit.Subscriber) error {
-	lines := []string{"#|Email|Signed Up"}
+	lines := []string{"#|Email|Signed up"}
 	for i, s := range subscribers {
 		lines = append(lines, fmt.Sprintf("%d|%s|%s",
 			i+1,
