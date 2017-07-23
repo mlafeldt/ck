@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
 // Config is used to configure the creation of the client.
@@ -82,24 +84,42 @@ type subscriberResponse struct {
 
 // Subscribers returns a list of all confirmed subscribers.
 func (c *Client) Subscribers() ([]Subscriber, error) {
+	url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s",
+		c.config.Endpoint, c.config.Secret)
+
+	var resp subscriberResponse
+	if err := c.sendRequest("GET", url, nil, &resp); err != nil {
+		return nil, err
+	}
+
+	numPages := resp.TotalPages
+	pages := make([]subscriberResponse, numPages)
+	pages[0] = resp // first request will give us the first page
+
+	// TODO: limit number of Go routines to be nicer to the API
+	var g errgroup.Group
+	for i := 2; i <= numPages; i++ {
+		i := i // see https://golang.org/doc/faq#closures_and_goroutines
+		g.Go(func() error {
+			url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s&page=%d",
+				c.config.Endpoint, c.config.Secret, i)
+
+			var resp subscriberResponse
+			err := c.sendRequest("GET", url, nil, &resp)
+			if err == nil {
+				pages[i-1] = resp
+			}
+			return err
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
+
 	var subscribers []Subscriber
-	page := 1
-
-	// TODO: speed up operation by processing subscriber pages concurrently
-	for {
-		url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s&page=%d",
-			c.config.Endpoint, c.config.Secret, page)
-
-		var resp subscriberResponse
-		if err := c.sendRequest("GET", url, nil, &resp); err != nil {
-			return nil, err
-		}
-		subscribers = append(subscribers, resp.Subscribers...)
-
-		if page >= resp.TotalPages {
-			break
-		}
-		page++
+	for i := 0; i < numPages; i++ {
+		subscribers = append(subscribers, pages[i].Subscribers...)
 	}
 
 	return subscribers, nil
