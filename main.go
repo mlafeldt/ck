@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/mlafeldt/ck/convertkit"
-
 	"github.com/ryanuber/columnize"
+
+	"github.com/mlafeldt/ck/convertkit"
 )
 
 func main() {
