@@ -44,7 +44,7 @@ func main() {
 		lines := []string{"#|Email|Signed Up"}
 		for i, s := range subscribers {
 			lines = append(lines, fmt.Sprintf("%d|%s|%s",
-				i,
+				i+1,
 				s.EmailAddress,
 				s.CreatedAt.Format(time.RFC3339),
 			))
