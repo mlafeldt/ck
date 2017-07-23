@@ -1,3 +1,5 @@
+// Package convertkit provides a client to the ConvertKit API v3.
+// See http://help.convertkit.com/article/33-api-documentation-v3
 package convertkit
 
 import (
