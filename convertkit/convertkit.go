@@ -96,6 +96,18 @@ func (c *Client) Subscribers() ([]Subscriber, error) {
 	return subscribers, nil
 }
 
+func (c *Client) TotalSubscribers() (int, error) {
+	url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s",
+		c.config.Endpoint, c.config.Secret)
+
+	var resp subscriberResponse
+	if err := c.sendRequest("GET", url, nil, &resp); err != nil {
+		return 0, err
+	}
+
+	return resp.TotalSubscribers, nil
+}
+
 func (c *Client) sendRequest(method, url string, body io.Reader, out interface{}) error {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
