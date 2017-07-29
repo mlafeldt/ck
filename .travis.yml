@@ -8,7 +8,7 @@ install: make deps
 
 script:
   - make build
-  - ./build/ck_linux_amd64 --version
+  - ./build/ck_linux_amd64 version
 
 deploy:
   provider: releases

@@ -22,10 +22,19 @@ go get -u github.com/mlafeldt/ck
 
 ## Usage
 
-List all confirmed subscribers for the given Convertkit account:
+```
+Usage:
+  ck [command]
 
-```bash
-ck [-csv]
+Available Commands:
+  help        Help about any command
+  subscribers List all confirmed subscribers
+  version     Show program version
+
+Flags:
+  -h, --help   help for ck
+
+Use "ck [command] --help" for more information about a command.
 ```
 
 The tool understands these environment variables:

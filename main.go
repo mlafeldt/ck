@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/csv"
-	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,36 +10,50 @@ import (
 	"time"
 
 	"github.com/ryanuber/columnize"
+	"github.com/spf13/cobra"
 
 	"github.com/mlafeldt/ck/convertkit"
 )
 
 func main() {
-	var csvFormat = flag.Bool("csv", false, "Output in CSV format")
-	var showVersion = flag.Bool("version", false, "Show program version")
-	flag.Parse()
-
-	if *showVersion {
-		fmt.Printf("ck %s %s/%s %s\n", Version,
-			runtime.GOOS, runtime.GOARCH, runtime.Version())
-		return
+	rootCmd := &cobra.Command{
+		Use:          "ck",
+		Short:        "The ConvertKit Tool",
+		SilenceUsage: true,
 	}
 
-	config := convertkit.DefaultConfig()
-	config.HTTPClient = &http.Client{Timeout: 10 * time.Second}
-	client, _ := convertkit.NewClient(config)
-	subscribers, err := client.Subscribers()
-	if err != nil {
-		abort("%s", err)
+	subscribersCmd := &cobra.Command{
+		Use:   "subscribers",
+		Short: "List all confirmed subscribers",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			config := convertkit.DefaultConfig()
+			config.HTTPClient = &http.Client{Timeout: 10 * time.Second}
+			client, _ := convertkit.NewClient(config)
+			subscribers, err := client.Subscribers()
+			if err != nil {
+				return err
+			}
+			if csv, _ := cmd.Flags().GetBool("csv"); csv {
+				return outputCSV(os.Stdout, subscribers)
+			}
+			return outputTable(os.Stdout, subscribers)
+		},
 	}
+	subscribersCmd.Flags().Bool("csv", false, "Output in CSV format")
+	rootCmd.AddCommand(subscribersCmd)
 
-	if *csvFormat {
-		err = outputCSV(os.Stdout, subscribers)
-	} else {
-		err = outputTable(os.Stdout, subscribers)
+	versionCmd := &cobra.Command{
+		Use:   "version",
+		Short: "Show program version",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("ck %s %s/%s %s\n", Version,
+				runtime.GOOS, runtime.GOARCH, runtime.Version())
+		},
 	}
-	if err != nil {
-		abort("%s", err)
+	rootCmd.AddCommand(versionCmd)
+
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
 	}
 }
 
@@ -70,9 +83,4 @@ func outputTable(w io.Writer, subscribers []convertkit.Subscriber) error {
 	}
 	_, err := fmt.Fprintln(w, columnize.SimpleFormat(lines))
 	return err
-}
-
-func abort(format string, a ...interface{}) {
-	fmt.Fprintf(os.Stderr, "error: "+format+"\n", a...)
-	os.Exit(1)
 }
