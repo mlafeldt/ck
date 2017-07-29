@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+// Config is used to configure the creation of the client.
 type Config struct {
 	Endpoint string
 	Key      string
@@ -19,6 +20,9 @@ type Config struct {
 	HTTPClient *http.Client
 }
 
+// DefaultConfig returns a default configuration for the client. It parses the
+// environment variables CONVERTKIT_ENDPOINT, CONVERTKIT_API_KEY, and
+// CONVERTKIT_API_SECRET.
 func DefaultConfig() *Config {
 	c := Config{
 		Endpoint:   "https://api.convertkit.com",
@@ -36,10 +40,12 @@ func DefaultConfig() *Config {
 	return &c
 }
 
+// Client is the client to the ConvertKit API. Create a client with NewClient.
 type Client struct {
 	config *Config
 }
 
+// NewClient returns a new client for the given configuration.
 func NewClient(c *Config) (*Client, error) {
 	defConfig := DefaultConfig()
 	if c.Endpoint == "" {
@@ -57,6 +63,7 @@ func NewClient(c *Config) (*Client, error) {
 	return &Client{config: c}, nil
 }
 
+// Subscriber describes a ConvertKit subscriber.
 type Subscriber struct {
 	ID           int               `json:"id"`
 	FirstName    string            `json:"first_name"`
@@ -73,6 +80,7 @@ type subscriberResponse struct {
 	Subscribers      []Subscriber `json:"subscribers"`
 }
 
+// Subscribers returns a list of all confirmed subscribers.
 func (c *Client) Subscribers() ([]Subscriber, error) {
 	var subscribers []Subscriber
 	page := 1
@@ -96,6 +104,7 @@ func (c *Client) Subscribers() ([]Subscriber, error) {
 	return subscribers, nil
 }
 
+// TotalSubscribers returns the number of confirmed subscribers.
 func (c *Client) TotalSubscribers() (int, error) {
 	url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s",
 		c.config.Endpoint, c.config.Secret)
