@@ -4,6 +4,7 @@ package convertkit
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,6 +12,14 @@ import (
 	"time"
 
 	"golang.org/x/sync/errgroup"
+)
+
+var (
+	// ErrKeyMissing is returned when the API key is required, but not present.
+	ErrKeyMissing = errors.New("ConvertKit API key missing")
+
+	// ErrSecretMissing is returned when the API secret is required, but not present.
+	ErrSecretMissing = errors.New("ConvertKit API secret missing")
 )
 
 // Config is used to configure the creation of the client.
@@ -128,6 +137,10 @@ func (c *Client) TotalSubscribers() (int, error) {
 }
 
 func (c *Client) subscriberPage(page int) (*subscriberPage, error) {
+	if c.config.Secret == "" {
+		return nil, ErrSecretMissing
+	}
+
 	url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s&page=%d",
 		c.config.Endpoint, c.config.Secret, page)
 
