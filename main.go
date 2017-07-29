@@ -16,17 +16,29 @@ import (
 )
 
 func main() {
+	var (
+		apiKey, apiSecret string
+	)
+
 	rootCmd := &cobra.Command{
 		Use:          "ck",
 		Short:        "The ConvertKit Tool",
 		SilenceUsage: true,
 	}
+	rootCmd.PersistentFlags().StringVar(&apiKey, "api-key", "", "Set API key for ConvertKit account")
+	rootCmd.PersistentFlags().StringVar(&apiSecret, "api-secret", "", "Set API secret for ConvertKit account")
 
 	subscribersCmd := &cobra.Command{
 		Use:   "subscribers",
 		Short: "List all confirmed subscribers",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := convertkit.DefaultConfig()
+			if apiKey != "" {
+				config.Key = apiKey
+			}
+			if apiSecret != "" {
+				config.Secret = apiSecret
+			}
 			config.HTTPClient = &http.Client{Timeout: 10 * time.Second}
 			client, _ := convertkit.NewClient(config)
 			subscribers, err := client.Subscribers()

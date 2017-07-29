@@ -32,7 +32,9 @@ Available Commands:
   version     Show program version
 
 Flags:
-  -h, --help   help for ck
+      --api-key string      Set API key for ConvertKit account
+      --api-secret string   Set API secret for ConvertKit account
+  -h, --help                help for ck
 
 Use "ck [command] --help" for more information about a command.
 ```
