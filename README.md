@@ -1,5 +1,8 @@
 # ck - The ConvertKit Tool
 
+[![Build Status](https://travis-ci.org/mlafeldt/ck.svg?branch=master)](https://travis-ci.org/mlafeldt/ck)
+[![GoDoc](https://godoc.org/github.com/mlafeldt/ck/convertkit?status.svg)](https://godoc.org/github.com/mlafeldt/ck/convertkit)
+
 Access the [ConvertKit API](http://help.convertkit.com/article/33-api-documentation-v3) from the command line.
 
 ## Installation
