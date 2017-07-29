@@ -1,0 +1,23 @@
+language: go
+
+sudo: false
+
+go: 1.8
+
+install: make deps
+
+script:
+  - make build
+  - ./build/ck_linux_amd64 --version
+
+deploy:
+  provider: releases
+  file:
+    - build/ck_darwin_amd64
+    - build/ck_linux_amd64
+    - build/SHA256SUMS
+  skip_cleanup: true
+  on:
+    tags: true
+  api_key:
+    secure: qzPYxtR4wWuChbbHwMQE6ju7G0KI1yqOuNcHOKNnScO7yr1JvzfrtKjafu5d27qbYaEck7N+JRdcVAViMP4mCpRYeh6SQF/2ivTgvKtvdkYkfHDjksGITkwWaJ18LNzNKSSCcrSWE4/eaNdNCck2bCa1RY3mRD6Gf6kIpitA6jjA/TqVrnPYRSILIJbMENZB6SuCG4A/2fQlNBF/64zHOfNCJlMchIApggQZTZ143S+7dTmGns7xKApGxZD7oHPF7VMFI58JvHKdzi+HlQAkTnynKEcJqsEVyhcGHADaGYvj/7XxiHW2LZfeyiC11Yd2ZOD35VnnazSy9y3ySIsLEE0AV8SZxslv+qGnWF3F/0h6FtzW9xHvM7ZCLv/wvccYatE7/NgGVX6zqJhe+UTVlviE1JTf2o4S4gCQynH/9kHNvk8yJ81yF4PmFOyhH+lZ0TrfDJX2rLXfx+Nh4UXdic4R1+E3sSaIxDnqWzxPTODnd/EP5XX00KLZqJQg/bIsmnhXK/0XHQLIMOKY5wZwfkVpsTUUheaoGtUOfGnsfDIc13Anwa3v0aqmVZ9iXzshrGwZznV/PplFK0XOdTWrCXID+SZ+M/s0aAWRWCWzaZbsm3iWLRNUl+FwK/o1zTRh5S4R5EEq65nC+wX9j5tNzcgzTh4/aDYI5amVhA8/tjI=
