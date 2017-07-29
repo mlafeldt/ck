@@ -7,7 +7,14 @@ Access the [ConvertKit API](http://help.convertkit.com/article/33-api-documentat
 
 ## Installation
 
-You can build the tool from source, provided you have Go installed:
+If you're on Mac OS X, the easiest way to get the `ck` command-line tool is via Homebrew:
+
+```bash
+brew tap mlafeldt/formulas
+brew install cktool
+```
+
+You can also build the tool from source, provided you have Go installed:
 
 ```bash
 go get -u github.com/mlafeldt/ck
