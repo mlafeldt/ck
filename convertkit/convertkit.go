@@ -75,7 +75,7 @@ type Subscriber struct {
 	Fields       map[string]string `json:"fields"`
 }
 
-type subscriberResponse struct {
+type subscriberPage struct {
 	TotalSubscribers int          `json:"total_subscribers"`
 	Page             int          `json:"page"`
 	TotalPages       int          `json:"total_pages"`
@@ -84,30 +84,23 @@ type subscriberResponse struct {
 
 // Subscribers returns a list of all confirmed subscribers.
 func (c *Client) Subscribers() ([]Subscriber, error) {
-	url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s",
-		c.config.Endpoint, c.config.Secret)
-
-	var resp subscriberResponse
-	if err := c.sendRequest("GET", url, nil, &resp); err != nil {
+	p, err := c.subscriberPage(1)
+	if err != nil {
 		return nil, err
 	}
 
-	numPages := resp.TotalPages
-	pages := make([]subscriberResponse, numPages)
-	pages[0] = resp // first request will give us the first page
+	total := p.TotalPages
+	pages := make([]subscriberPage, total)
+	pages[0] = *p
 
 	// TODO: limit number of Go routines to be nicer to the API
 	var g errgroup.Group
-	for i := 2; i <= numPages; i++ {
+	for i := 2; i <= total; i++ {
 		i := i // see https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
-			url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s&page=%d",
-				c.config.Endpoint, c.config.Secret, i)
-
-			var resp subscriberResponse
-			err := c.sendRequest("GET", url, nil, &resp)
+			p, err := c.subscriberPage(i)
 			if err == nil {
-				pages[i-1] = resp
+				pages[i-1] = *p
 			}
 			return err
 		})
@@ -118,7 +111,7 @@ func (c *Client) Subscribers() ([]Subscriber, error) {
 	}
 
 	var subscribers []Subscriber
-	for i := 0; i < numPages; i++ {
+	for i := 0; i < total; i++ {
 		subscribers = append(subscribers, pages[i].Subscribers...)
 	}
 
@@ -127,15 +120,23 @@ func (c *Client) Subscribers() ([]Subscriber, error) {
 
 // TotalSubscribers returns the number of confirmed subscribers.
 func (c *Client) TotalSubscribers() (int, error) {
-	url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s",
-		c.config.Endpoint, c.config.Secret)
-
-	var resp subscriberResponse
-	if err := c.sendRequest("GET", url, nil, &resp); err != nil {
+	resp, err := c.subscriberPage(1)
+	if err != nil {
 		return 0, err
 	}
-
 	return resp.TotalSubscribers, nil
+}
+
+func (c *Client) subscriberPage(page int) (*subscriberPage, error) {
+	url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s&page=%d",
+		c.config.Endpoint, c.config.Secret, page)
+
+	var resp subscriberPage
+	if err := c.sendRequest("GET", url, nil, &resp); err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
 }
 
 func (c *Client) sendRequest(method, url string, body io.Reader, out interface{}) error {
