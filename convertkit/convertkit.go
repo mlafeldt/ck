@@ -85,6 +85,7 @@ func (c *Client) Subscribers() ([]Subscriber, error) {
 	var subscribers []Subscriber
 	page := 1
 
+	// TODO: speed up operation by processing subscriber pages concurrently
 	for {
 		url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s&page=%d",
 			c.config.Endpoint, c.config.Secret, page)
