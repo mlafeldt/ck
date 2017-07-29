@@ -17,7 +17,7 @@ import (
 
 func main() {
 	var (
-		apiKey, apiSecret string
+		apiKey, apiSecret, apiEndpoint string
 	)
 
 	rootCmd := &cobra.Command{
@@ -27,6 +27,7 @@ func main() {
 	}
 	rootCmd.PersistentFlags().StringVar(&apiKey, "api-key", "", "Set API key for ConvertKit account")
 	rootCmd.PersistentFlags().StringVar(&apiSecret, "api-secret", "", "Set API secret for ConvertKit account")
+	rootCmd.PersistentFlags().StringVar(&apiEndpoint, "api-endpoint", "", "Set ConvertKit API endpoint")
 
 	subscribersCmd := &cobra.Command{
 		Use:   "subscribers",
@@ -38,6 +39,9 @@ func main() {
 			}
 			if apiSecret != "" {
 				config.Secret = apiSecret
+			}
+			if apiEndpoint != "" {
+				config.Endpoint = apiEndpoint
 			}
 			config.HTTPClient = &http.Client{Timeout: 10 * time.Second}
 			client, _ := convertkit.NewClient(config)

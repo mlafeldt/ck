@@ -32,18 +32,19 @@ Available Commands:
   version     Show program version
 
 Flags:
-      --api-key string      Set API key for ConvertKit account
-      --api-secret string   Set API secret for ConvertKit account
-  -h, --help                help for ck
+      --api-endpoint string   Set ConvertKit API endpoint
+      --api-key string        Set API key for ConvertKit account
+      --api-secret string     Set API secret for ConvertKit account
+  -h, --help                  help for ck
 
 Use "ck [command] --help" for more information about a command.
 ```
 
 The tool understands these environment variables:
 
-* `CONVERTKIT_ENDPOINT`
-* `CONVERTKIT_API_KEY`
-* `CONVERTKIT_API_SECRET`
+* `CONVERTKIT_API_KEY` - the same as `--api-key`
+* `CONVERTKIT_API_SECRET` - the same as `--api-secret`
+* `CONVERTKIT_API_ENDPOINT` - the same as `--api-endpoint`
 
 ## Go library
 

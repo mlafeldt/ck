@@ -30,7 +30,7 @@ func DefaultConfig() *Config {
 		Endpoint:   "https://api.convertkit.com",
 		HTTPClient: http.DefaultClient,
 	}
-	if v := os.Getenv("CONVERTKIT_ENDPOINT"); v != "" {
+	if v := os.Getenv("CONVERTKIT_API_ENDPOINT"); v != "" {
 		c.Endpoint = v
 	}
 	if v := os.Getenv("CONVERTKIT_API_KEY"); v != "" {
