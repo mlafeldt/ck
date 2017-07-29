@@ -120,23 +120,23 @@ func (c *Client) Subscribers() ([]Subscriber, error) {
 
 // TotalSubscribers returns the number of confirmed subscribers.
 func (c *Client) TotalSubscribers() (int, error) {
-	resp, err := c.subscriberPage(1)
+	p, err := c.subscriberPage(1)
 	if err != nil {
 		return 0, err
 	}
-	return resp.TotalSubscribers, nil
+	return p.TotalSubscribers, nil
 }
 
 func (c *Client) subscriberPage(page int) (*subscriberPage, error) {
 	url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s&page=%d",
 		c.config.Endpoint, c.config.Secret, page)
 
-	var resp subscriberPage
-	if err := c.sendRequest("GET", url, nil, &resp); err != nil {
+	var p subscriberPage
+	if err := c.sendRequest("GET", url, nil, &p); err != nil {
 		return nil, err
 	}
 
-	return &resp, nil
+	return &p, nil
 }
 
 func (c *Client) sendRequest(method, url string, body io.Reader, out interface{}) error {
