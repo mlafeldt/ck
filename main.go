@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/ryanuber/columnize"
@@ -16,7 +17,14 @@ import (
 
 func main() {
 	var csvFormat = flag.Bool("csv", false, "Output in CSV format")
+	var showVersion = flag.Bool("version", false, "Show program version")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("ck %s %s/%s %s\n", Version,
+			runtime.GOOS, runtime.GOARCH, runtime.Version())
+		return
+	}
 
 	config := convertkit.DefaultConfig()
 	config.HTTPClient = &http.Client{Timeout: 10 * time.Second}
