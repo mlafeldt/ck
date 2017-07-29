@@ -98,7 +98,7 @@ func (c *Client) Subscribers() ([]Subscriber, error) {
 		if page >= resp.TotalPages {
 			break
 		}
-		page += 1
+		page++
 	}
 
 	return subscribers, nil
