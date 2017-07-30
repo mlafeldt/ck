@@ -99,11 +99,15 @@ func (c *Client) Subscribers() ([]Subscriber, error) {
 	}
 
 	total := p.TotalPages
+	if total <= 1 {
+		return p.Subscribers, nil
+	}
+
+	var g errgroup.Group
 	pages := make([]subscriberPage, total)
 	pages[0] = *p
 
 	// TODO: limit number of Go routines to be nicer to the API
-	var g errgroup.Group
 	for i := 2; i <= total; i++ {
 		i := i // see https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
