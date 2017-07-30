@@ -29,6 +29,8 @@ func main() {
 	rootCmd.PersistentFlags().StringVar(&apiSecret, "api-secret", "", "Set API secret for ConvertKit account")
 	rootCmd.PersistentFlags().StringVar(&apiEndpoint, "api-endpoint", "", "Set ConvertKit API endpoint")
 
+	var query convertkit.SubscriberQuery
+	var csv bool
 	subscribersCmd := &cobra.Command{
 		Use:   "subscribers",
 		Short: "List all confirmed subscribers",
@@ -45,17 +47,22 @@ func main() {
 			}
 			config.HTTPClient = &http.Client{Timeout: 10 * time.Second}
 			client, _ := convertkit.NewClient(config)
-			subscribers, err := client.Subscribers()
+			subscribers, err := client.Subscribers(&query)
 			if err != nil {
 				return err
 			}
-			if csv, _ := cmd.Flags().GetBool("csv"); csv {
+			if csv {
 				return outputCSV(os.Stdout, subscribers)
 			}
 			return outputTable(os.Stdout, subscribers)
 		},
 	}
-	subscribersCmd.Flags().Bool("csv", false, "Output in CSV format")
+	subscribersCmd.Flags().StringVar(&query.Since, "since", "", "Filter subscribers added on or after this date")
+	subscribersCmd.Flags().StringVar(&query.Until, "until", "", "Filter subscribers added on or before this date")
+	subscribersCmd.Flags().BoolVar(&query.Reverse, "reverse", false, "List subscribers in reverse order")
+	subscribersCmd.Flags().BoolVar(&query.Cancelled, "cancelled", false, "List cancelled subscribers")
+	subscribersCmd.Flags().StringVar(&query.EmailAddress, "email", "", "Filter subscribers by email address")
+	subscribersCmd.Flags().BoolVar(&csv, "csv", false, "Output in CSV format")
 	rootCmd.AddCommand(subscribersCmd)
 
 	versionCmd := &cobra.Command{

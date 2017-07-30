@@ -1,3 +1,7 @@
+## v0.3.0 (unreleased)
+
+* `ck subscribers` learned to filter subscribers via `--since`, `--until`, `--cancelled`, and `--email`. Also, `--reverse` will now list results in reverse order.
+
 ## v0.2.0 (2017-07-30)
 
 * Introduce `ck subscribers` and `ck version` commands.

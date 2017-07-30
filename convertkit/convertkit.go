@@ -74,6 +74,14 @@ func NewClient(c *Config) (*Client, error) {
 	return &Client{config: c}, nil
 }
 
+// SubscriberQuery parameterizes what subscriber data to request.
+type SubscriberQuery struct {
+	Since, Until string // TODO: turn this into time.Date
+	Reverse      bool
+	Cancelled    bool
+	EmailAddress string
+}
+
 // Subscriber describes a ConvertKit subscriber.
 type Subscriber struct {
 	ID           int               `json:"id"`
@@ -92,8 +100,8 @@ type subscriberPage struct {
 }
 
 // Subscribers returns a list of all confirmed subscribers.
-func (c *Client) Subscribers() ([]Subscriber, error) {
-	p, err := c.subscriberPage(1)
+func (c *Client) Subscribers(query *SubscriberQuery) ([]Subscriber, error) {
+	p, err := c.subscriberPage(1, query)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +119,7 @@ func (c *Client) Subscribers() ([]Subscriber, error) {
 	for i := 2; i <= total; i++ {
 		i := i // see https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
-			p, err := c.subscriberPage(i)
+			p, err := c.subscriberPage(i, query)
 			if err == nil {
 				pages[i-1] = *p
 			}
@@ -133,20 +141,38 @@ func (c *Client) Subscribers() ([]Subscriber, error) {
 
 // TotalSubscribers returns the number of confirmed subscribers.
 func (c *Client) TotalSubscribers() (int, error) {
-	p, err := c.subscriberPage(1)
+	p, err := c.subscriberPage(1, nil)
 	if err != nil {
 		return 0, err
 	}
 	return p.TotalSubscribers, nil
 }
 
-func (c *Client) subscriberPage(page int) (*subscriberPage, error) {
+func (c *Client) subscriberPage(page int, query *SubscriberQuery) (*subscriberPage, error) {
 	if c.config.Secret == "" {
 		return nil, ErrSecretMissing
 	}
 
 	url := fmt.Sprintf("%s/v3/subscribers?api_secret=%s&page=%d",
 		c.config.Endpoint, c.config.Secret, page)
+
+	if query != nil {
+		if query.Since != "" {
+			url += fmt.Sprintf("&from=%s", query.Since)
+		}
+		if query.Until != "" {
+			url += fmt.Sprintf("&to=%s", query.Until)
+		}
+		if query.Reverse {
+			url += "&sort_order=desc"
+		}
+		if query.Cancelled {
+			url += "&sort_field=cancelled_at"
+		}
+		if query.EmailAddress != "" {
+			url += fmt.Sprintf("&email_address=%s", query.EmailAddress)
+		}
+	}
 
 	var p subscriberPage
 	if err := c.sendRequest("GET", url, nil, &p); err != nil {
