@@ -16,6 +16,7 @@ deploy:
     - build/ck_darwin_amd64
     - build/ck_linux_amd64
     - build/SHA256SUMS
+    - build/cktool.rb
   skip_cleanup: true
   on:
     tags: true
