@@ -12,6 +12,6 @@ class Cktool < Formula
   end
 
   test do
-    system "#{bin}/ck --version"
+    system "#{bin}/ck version"
   end
 end
