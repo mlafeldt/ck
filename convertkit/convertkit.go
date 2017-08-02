@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -192,6 +193,9 @@ func (c *Client) subscriberPage(page int, query *SubscriberQuery) (*subscriberPa
 
 func parseDate(date string) (string, error) {
 	const format string = "2006-01-02"
+	if strings.ToLower(date) == "yesterday" {
+		return time.Now().Add(-24 * time.Hour).Format(format), nil
+	}
 	if _, err := time.Parse(format, date); err != nil {
 		return "", err
 	}
