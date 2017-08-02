@@ -1,6 +1,8 @@
-## v0.3.0 (unreleased)
+## v0.3.0 (2017-08-02)
 
-* `ck subscribers` learned to filter subscribers via `--since`, `--until`, `--cancelled`, and `--email`. Also, `--reverse` will now list results in reverse order.
+* `ck subscribers` learned to filter subscribers via `--since`, `--until`, `--cancelled`, and `--email`.
+* Also, `--reverse` will now list results in reverse order.
+* Auto-generate Homebrew formula when tagging a new release.
 
 ## v0.2.0 (2017-07-30)
 
