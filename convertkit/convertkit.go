@@ -158,10 +158,18 @@ func (c *Client) subscriberPage(page int, query *SubscriberQuery) (*subscriberPa
 
 	if query != nil {
 		if query.Since != "" {
-			url += fmt.Sprintf("&from=%s", query.Since)
+			since, err := parseDate(query.Since)
+			if err != nil {
+				return nil, err
+			}
+			url += fmt.Sprintf("&from=%s", since)
 		}
 		if query.Until != "" {
-			url += fmt.Sprintf("&to=%s", query.Until)
+			until, err := parseDate(query.Until)
+			if err != nil {
+				return nil, err
+			}
+			url += fmt.Sprintf("&to=%s", until)
 		}
 		if query.Reverse {
 			url += "&sort_order=desc"
@@ -180,6 +188,14 @@ func (c *Client) subscriberPage(page int, query *SubscriberQuery) (*subscriberPa
 	}
 
 	return &p, nil
+}
+
+func parseDate(date string) (string, error) {
+	const format string = "2006-01-02"
+	if _, err := time.Parse(format, date); err != nil {
+		return "", err
+	}
+	return date, nil
 }
 
 func (c *Client) sendRequest(method, url string, body io.Reader, out interface{}) error {

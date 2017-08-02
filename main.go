@@ -47,8 +47,8 @@ func main() {
 			return outputTable(os.Stdout, subscribers)
 		},
 	}
-	subscribersCmd.Flags().StringVar(&query.Since, "since", "", "Filter subscribers added on or after this date")
-	subscribersCmd.Flags().StringVar(&query.Until, "until", "", "Filter subscribers added on or before this date")
+	subscribersCmd.Flags().StringVar(&query.Since, "since", "", "Filter subscribers added on or after this date (YYYY-MM-DD)")
+	subscribersCmd.Flags().StringVar(&query.Until, "until", "", "Filter subscribers added on or before this date (YYYY-MM-DD)")
 	subscribersCmd.Flags().BoolVar(&query.Reverse, "reverse", false, "List subscribers in reverse order")
 	subscribersCmd.Flags().BoolVar(&query.Cancelled, "cancelled", false, "List cancelled subscribers")
 	subscribersCmd.Flags().StringVar(&query.EmailAddress, "email", "", "Filter subscribers by email address")
