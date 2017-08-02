@@ -33,7 +33,7 @@ func main() {
 	var csv bool
 	subscribersCmd := &cobra.Command{
 		Use:   "subscribers",
-		Short: "List all confirmed subscribers",
+		Short: "List subscribers",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := convertkit.DefaultConfig()
 			if apiKey != "" {

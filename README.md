@@ -28,7 +28,7 @@ Usage:
 
 Available Commands:
   help        Help about any command
-  subscribers List all confirmed subscribers
+  subscribers List subscribers
   version     Show program version
 
 Flags:
