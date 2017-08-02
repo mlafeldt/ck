@@ -16,36 +16,26 @@ import (
 )
 
 func main() {
-	var (
-		apiKey, apiSecret, apiEndpoint string
-	)
+	config := convertkit.DefaultConfig()
+	config.HTTPClient = &http.Client{Timeout: 10 * time.Second}
 
 	rootCmd := &cobra.Command{
 		Use:          "ck",
 		Short:        "The ConvertKit Tool",
 		SilenceUsage: true,
 	}
-	rootCmd.PersistentFlags().StringVar(&apiKey, "api-key", "", "Set API key for ConvertKit account")
-	rootCmd.PersistentFlags().StringVar(&apiSecret, "api-secret", "", "Set API secret for ConvertKit account")
-	rootCmd.PersistentFlags().StringVar(&apiEndpoint, "api-endpoint", "", "Set ConvertKit API endpoint")
+	rootCmd.PersistentFlags().StringVar(&config.Key, "api-key", "", "Set API key for ConvertKit account")
+	rootCmd.PersistentFlags().StringVar(&config.Secret, "api-secret", "", "Set API secret for ConvertKit account")
+	rootCmd.PersistentFlags().StringVar(&config.Endpoint, "api-endpoint", "", "Set ConvertKit API endpoint")
 
-	var query convertkit.SubscriberQuery
-	var csv bool
+	var (
+		query convertkit.SubscriberQuery
+		csv   bool
+	)
 	subscribersCmd := &cobra.Command{
 		Use:   "subscribers",
 		Short: "List subscribers",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := convertkit.DefaultConfig()
-			if apiKey != "" {
-				config.Key = apiKey
-			}
-			if apiSecret != "" {
-				config.Secret = apiSecret
-			}
-			if apiEndpoint != "" {
-				config.Endpoint = apiEndpoint
-			}
-			config.HTTPClient = &http.Client{Timeout: 10 * time.Second}
 			client, _ := convertkit.NewClient(config)
 			subscribers, err := client.Subscribers(&query)
 			if err != nil {
