@@ -29,6 +29,8 @@ type Config struct {
 	Key      string
 	Secret   string
 
+	ConcurrentRequests int
+
 	HTTPClient *http.Client
 }
 
@@ -37,8 +39,9 @@ type Config struct {
 // CONVERTKIT_API_SECRET.
 func DefaultConfig() *Config {
 	c := Config{
-		Endpoint:   "https://api.convertkit.com",
-		HTTPClient: http.DefaultClient,
+		Endpoint:           "https://api.convertkit.com",
+		ConcurrentRequests: 8,
+		HTTPClient:         http.DefaultClient,
 	}
 	if v := os.Getenv("CONVERTKIT_API_ENDPOINT"); v != "" {
 		c.Endpoint = v
@@ -68,6 +71,9 @@ func NewClient(c *Config) (*Client, error) {
 	}
 	if c.Secret == "" {
 		c.Secret = defConfig.Secret
+	}
+	if c.ConcurrentRequests == 0 {
+		c.ConcurrentRequests = defConfig.ConcurrentRequests
 	}
 	if c.HTTPClient == nil {
 		c.HTTPClient = defConfig.HTTPClient
@@ -113,13 +119,17 @@ func (c *Client) Subscribers(query *SubscriberQuery) ([]Subscriber, error) {
 	}
 
 	var g errgroup.Group
+	limiter := make(chan bool, c.config.ConcurrentRequests)
+
 	pages := make([]subscriberPage, total)
 	pages[0] = *p
 
-	// TODO: limit number of Go routines to be nicer to the API
 	for i := 2; i <= total; i++ {
 		i := i // see https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
+			limiter <- true
+			defer func() { <-limiter }()
+
 			p, err := c.subscriberPage(i, query)
 			if err == nil {
 				pages[i-1] = *p
