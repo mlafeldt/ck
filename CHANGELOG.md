@@ -1,3 +1,8 @@
+## v0.4.0 (unreleased)
+
+* Limit the number of concurrent requests to be nicer to the ConvertKit API.
+* Fix generated Homebrew version.
+
 ## v0.3.0 (2017-08-02)
 
 * `ck subscribers` learned to filter subscribers via `--since`, `--until`, `--cancelled`, and `--email`.
